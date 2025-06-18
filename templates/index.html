@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EzeCrypto - Your Crypto Assistant 🚀</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <h1>🚀 EzeCrypto</h1>
+            <p>Your friendly cryptocurrency recommendation assistant</p>
+        </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <!-- Initial bot message will be added by JavaScript -->
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="avatar bot-avatar">🤖</div>
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+        
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="sendQuickMessage('What are the most sustainable cryptocurrencies?')">🌱 Eco-Friendly</button>
+            <button class="quick-btn" onclick="sendQuickMessage('What is trending right now?')">📈 Trending</button>
+            <button class="quick-btn" onclick="requestFullSummary()">📊 Full Summary</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Best long term investments?')">🎯 Long-term</button>
+        </div>
+        
+        <form class="input-area" id="chatForm">
+            <input type="text" class="message-input" id="messageInput" placeholder="Ask me about cryptocurrencies..." maxlength="500" autocomplete="off">
+            <button type="submit" class="send-button" id="sendButton">Send</button>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
