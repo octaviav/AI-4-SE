@@ -1,441 +1,355 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template_string, request, jsonify
 import random
+import json
+from datetime import datetime
 
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__)
 
-class EzeCrypto:
-    def __init__(self):
-        self.name = "EzeCrypto"
-        self.crypto_db = {
-            "Bitcoin": {
-                "symbol": "BTC",
-                "price_trend": "rising",
-                "market_cap": "high",
-                "energy_use": "high",
-                "sustainability_score": 3,
-                "volatility": "medium",
-                "adoption": "high",
-                "current_price": "$67,500",
-                "growth_potential": "moderate"
+# Sample cryptocurrency data for demonstration
+CRYPTO_DATA = {
+    "Bitcoin": {
+        "symbol": "BTC",
+        "current_price": "$43,250",
+        "market_cap": "$847B",
+        "price_trend": "rising",
+        "volatility": "Medium",
+        "adoption": "Very High",
+        "growth_potential": "moderate_growth",
+        "sustainability_score": 3,
+        "energy_use": "Very High",
+        "recommendation": "Strong store of value but high energy consumption"
+    },
+    "Ethereum": {
+        "symbol": "ETH",
+        "current_price": "$2,650",
+        "market_cap": "$318B",
+        "price_trend": "stable",
+        "volatility": "Medium",
+        "adoption": "Very High",
+        "growth_potential": "high_growth",
+        "sustainability_score": 8,
+        "energy_use": "Low (after merge)",
+        "recommendation": "Excellent for DeFi and smart contracts with improved sustainability"
+    },
+    "Cardano": {
+        "symbol": "ADA",
+        "current_price": "$0.48",
+        "market_cap": "$17B",
+        "price_trend": "rising",
+        "volatility": "High",
+        "adoption": "Medium",
+        "growth_potential": "high_growth",
+        "sustainability_score": 9,
+        "energy_use": "Very Low",
+        "recommendation": "Great sustainable choice with strong academic foundation"
+    },
+    "Solana": {
+        "symbol": "SOL",
+        "current_price": "$98",
+        "market_cap": "$43B",
+        "price_trend": "rising",
+        "volatility": "High",
+        "adoption": "High",
+        "growth_potential": "very_high_growth",
+        "sustainability_score": 7,
+        "energy_use": "Low",
+        "recommendation": "Fast and efficient but still developing ecosystem"
+    },
+    "Polkadot": {
+        "symbol": "DOT",
+        "current_price": "$7.20",
+        "market_cap": "$9B",
+        "price_trend": "stable",
+        "volatility": "High",
+        "adoption": "Medium",
+        "growth_potential": "high_growth",
+        "sustainability_score": 8,
+        "energy_use": "Low",
+        "recommendation": "Innovative interoperability solution with good sustainability"
+    },
+    "Algorand": {
+        "symbol": "ALGO",
+        "current_price": "$0.19",
+        "market_cap": "$1.5B",
+        "price_trend": "stable",
+        "volatility": "Medium",
+        "adoption": "Low",
+        "growth_potential": "high_growth",
+        "sustainability_score": 10,
+        "energy_use": "Carbon Negative",
+        "recommendation": "Most sustainable option with strong technology foundation"
+    },
+    "Tezos": {
+        "symbol": "XTZ",
+        "current_price": "$1.02",
+        "market_cap": "$950M",
+        "price_trend": "declining",
+        "volatility": "High",
+        "adoption": "Low",
+        "growth_potential": "moderate_growth",
+        "sustainability_score": 9,
+        "energy_use": "Very Low",
+        "recommendation": "Sustainable and self-upgrading but needs more adoption"
+    },
+    "Chainlink": {
+        "symbol": "LINK",
+        "current_price": "$14.80",
+        "market_cap": "$8.2B",
+        "price_trend": "rising",
+        "volatility": "High",
+        "adoption": "High",
+        "growth_potential": "high_growth",
+        "sustainability_score": 6,
+        "energy_use": "Medium",
+        "recommendation": "Essential oracle infrastructure with growing demand"
+    }
+}
+
+def generate_crypto_response(user_message):
+    """Generate contextual responses based on user input"""
+    message_lower = user_message.lower()
+    
+    # Eco-friendly/Sustainable queries
+    if any(word in message_lower for word in ['sustainable', 'eco', 'green', 'environment', 'energy']):
+        sustainable_coins = [(name, data) for name, data in CRYPTO_DATA.items() if data['sustainability_score'] >= 8]
+        response = "🌱 Here are the most sustainable cryptocurrencies:\n\n"
+        for name, data in sustainable_coins:
+            response += f"🌿 **{name} ({data['symbol']})** - Sustainability Score: {data['sustainability_score']}/10\n"
+            response += f"   ⚡ Energy Use: {data['energy_use']}\n"
+            response += f"   💡 {data['recommendation']}\n\n"
+        response += "🌍 These coins use energy-efficient consensus mechanisms and have minimal environmental impact!"
+        return response
+    
+    # Trending/Popular queries
+    elif any(word in message_lower for word in ['trending', 'popular', 'hot', 'rising']):
+        rising_coins = [(name, data) for name, data in CRYPTO_DATA.items() if data['price_trend'] == 'rising']
+        response = "📈 Currently trending cryptocurrencies:\n\n"
+        for name, data in rising_coins:
+            response += f"🚀 **{name} ({data['symbol']})** - {data['current_price']}\n"
+            response += f"   📊 Market Cap: {data['market_cap']}\n"
+            response += f"   🎯 Growth Potential: {data['growth_potential'].replace('_', ' ').title()}\n\n"
+        response += "🔥 These coins are showing upward momentum right now!"
+        return response
+    
+    # Long-term investment queries
+    elif any(word in message_lower for word in ['long term', 'investment', 'hodl', 'future']):
+        response = "🎯 Best long-term investment options:\n\n"
+        response += "🏆 **Top Picks for Long-term:**\n"
+        response += "1. **Ethereum (ETH)** - Smart contract leader with sustainable upgrade\n"
+        response += "2. **Cardano (ADA)** - Academic approach with high sustainability\n"
+        response += "3. **Algorand (ALGO)** - Most sustainable with strong tech foundation\n\n"
+        response += "💡 **Strategy Tips:**\n"
+        response += "• Diversify across different use cases\n"
+        response += "• Consider sustainability for future regulations\n"
+        response += "• Look for strong development teams and communities\n"
+        response += "• Don't invest more than you can afford to lose!"
+        return response
+    
+    # Price/Market queries
+    elif any(word in message_lower for word in ['price', 'cost', 'value', 'market']):
+        response = "💰 Current market overview:\n\n"
+        for name, data in list(CRYPTO_DATA.items())[:5]:  # Top 5 by market cap
+            trend_emoji = "📈" if data['price_trend'] == 'rising' else "📊" if data['price_trend'] == 'stable' else "📉"
+            response += f"{trend_emoji} **{name}**: {data['current_price']} (Market Cap: {data['market_cap']})\n"
+        response += "\n💡 Remember: Prices are highly volatile and can change rapidly!"
+        return response
+    
+    # General help or greeting
+    elif any(word in message_lower for word in ['hello', 'hi', 'help', 'what can you do']):
+        return ("🚀 Welcome to EzeCrypto! I'm here to help you navigate the crypto universe!\n\n"
+                "🤖 **I can help you with:**\n"
+                "• 🌱 Sustainable cryptocurrency recommendations\n"
+                "• 📈 Trending coins and market analysis\n"
+                "• 🎯 Long-term investment strategies\n"
+                "• 💰 Current prices and market caps\n"
+                "• 📊 Comprehensive crypto summaries\n\n"
+                "Just ask me anything about cryptocurrencies!")
+    
+    # Default response for unrecognized queries
+    else:
+        responses = [
+            "🤔 That's an interesting question! For specific crypto advice, try asking about sustainable coins, trending options, or long-term investments.",
+            "🚀 I'd love to help! You can ask me about eco-friendly cryptocurrencies, current trends, or market analysis.",
+            "💡 Great question! I specialize in crypto recommendations. Try asking about sustainable investments or trending coins!",
+            "🤷‍♂️ I'm not sure about that specific topic, but I can definitely help with cryptocurrency recommendations and market insights!"
+        ]
+        return random.choice(responses)
+
+def generate_full_summary():
+    """Generate comprehensive summary of all cryptocurrencies"""
+    coins_list = []
+    for name, data in CRYPTO_DATA.items():
+        coins_list.append({
+            "name": name,
+            "symbol": data["symbol"],
+            "current_price": data["current_price"],
+            "market_cap": data["market_cap"],
+            "price_trend": data["price_trend"],
+            "volatility": data["volatility"],
+            "adoption": data["adoption"],
+            "growth_potential": data["growth_potential"],
+            "sustainability_score": data["sustainability_score"],
+            "energy_use": data["energy_use"],
+            "recommendation": data["recommendation"]
+        })
+    
+    # Generate statistics
+    rising_coins = [coin for coin in coins_list if coin['price_trend'] == 'rising']
+    stable_coins = [coin for coin in coins_list if coin['price_trend'] == 'stable']
+    eco_friendly = [coin for coin in coins_list if coin['sustainability_score'] >= 8]
+    high_growth = [coin for coin in coins_list if 'high' in coin['growth_potential']]
+    
+    # Find top picks
+    most_sustainable = max(coins_list, key=lambda x: x['sustainability_score'])
+    highest_growth = max(coins_list, key=lambda x: 3 if 'very_high' in x['growth_potential'] else 2 if 'high' in x['growth_potential'] else 1)
+    
+    # Best balanced (high sustainability + growth)
+    balanced_scores = []
+    for coin in coins_list:
+        growth_score = 3 if 'very_high' in coin['growth_potential'] else 2 if 'high' in coin['growth_potential'] else 1
+        balanced_score = (coin['sustainability_score'] + growth_score * 2) / 3
+        balanced_scores.append((coin, balanced_score))
+    
+    best_balanced = max(balanced_scores, key=lambda x: x[1])[0]
+    
+    return {
+        "coins": coins_list,
+        "statistics": {
+            "rising": {
+                "count": len(rising_coins),
+                "coins": [coin['symbol'] for coin in rising_coins]
             },
-            "Ethereum": {
-                "symbol": "ETH", 
-                "price_trend": "stable",
-                "market_cap": "high",
-                "energy_use": "medium",
-                "sustainability_score": 6,
-                "volatility": "medium",
-                "adoption": "high",
-                "current_price": "$3,200",
-                "growth_potential": "high"
+            "stable": {
+                "count": len(stable_coins),
+                "coins": [coin['symbol'] for coin in stable_coins]
             },
-            "Cardano": {
-                "symbol": "ADA",
-                "price_trend": "rising",
-                "market_cap": "medium",
-                "energy_use": "low",
-                "sustainability_score": 8,
-                "volatility": "high",
-                "adoption": "medium",
-                "current_price": "$0.85",
-                "growth_potential": "high"
+            "eco_friendly": {
+                "count": len(eco_friendly),
+                "coins": [coin['symbol'] for coin in eco_friendly]
             },
-            "Solana": {
-                "symbol": "SOL",
-                "price_trend": "rising",
-                "market_cap": "medium",
-                "energy_use": "low",
-                "sustainability_score": 7,
-                "volatility": "high",
-                "adoption": "medium",
-                "current_price": "$145",
-                "growth_potential": "very_high"
+            "high_growth": {
+                "count": len(high_growth),
+                "coins": [coin['symbol'] for coin in high_growth]
+            }
+        },
+        "top_picks": {
+            "most_sustainable": {
+                "name": most_sustainable['name'],
+                "score": most_sustainable['sustainability_score']
             },
-            "Polygon": {
-                "symbol": "MATIC",
-                "price_trend": "stable",
-                "market_cap": "medium",
-                "energy_use": "very_low",
-                "sustainability_score": 9,
-                "volatility": "high",
-                "adoption": "medium",
-                "current_price": "$0.92",
-                "growth_potential": "high"
+            "highest_growth": {
+                "name": highest_growth['name'],
+                "potential": highest_growth['growth_potential'].replace('_', ' ').title()
             },
-            "Chainlink": {
-                "symbol": "LINK",
-                "price_trend": "rising",
-                "market_cap": "medium",
-                "energy_use": "low",
-                "sustainability_score": 7,
-                "volatility": "medium",
-                "adoption": "high",
-                "current_price": "$18.50",
-                "growth_potential": "high"
+            "best_balanced": {
+                "name": best_balanced['name']
             }
         }
-        
-        self.greetings = [
-            "Hey there! 🚀 Ready to explore the crypto universe?",
-        ]
-        
-        self.disclaimers = [
-            "⚠️  Remember: Crypto is risky—always do your own research!",
-        ]
-
-    def greet(self):
-        """Welcome message for the chatbot"""
-        print("=" * 60)
-        print(f"🤖 Welcome to {self.name}! Your Crypto Recommendation Assistant")
-        print("=" * 60)
-        print(random.choice(self.greetings))
-        print("\nYou can ask me about:")
-        print("• Trending cryptocurrencies")
-        print("• Sustainable/eco-friendly coins")
-        print("• High-growth potential investments")
-        print("• Specific coin information")
-        print("• Investment advice based on your preferences")
-        print("• Detailed summary of all cryptocurrencies")
-        print("\nType 'quit' or 'exit' to end our chat.")
-        print("-" * 60)
-
-    def display_detailed_summary(self):
-        """Display a comprehensive summary of all cryptocurrencies"""
-        print("\n" + "=" * 80)
-        print("📊 DETAILED CRYPTOCURRENCY SUMMARY")
-        print("=" * 80)
-        
-        # Sort coins by market cap and price for better presentation
-        sorted_coins = []
-        for coin, data in self.crypto_db.items():
-            # Convert price to float 
-            price_str = data["current_price"].replace("$", "").replace(",", "")
-            try:
-                price_value = float(price_str)
-            except:
-                price_value = 0
-            sorted_coins.append((coin, data, price_value))
-        
-        # Sort by price (highest first)
-        sorted_coins.sort(key=lambda x: x[2], reverse=True)
-        
-        for i, (coin, data, _) in enumerate(sorted_coins, 1):
-            print(f"\n{i}. {coin} ({data['symbol']})")
-            print("-" * 50)
-            
-            # Price and trend
-            trend_emoji = "📈" if data['price_trend'] == 'rising' else "📊" if data['price_trend'] == 'stable' else "📉"
-            print(f"   💰 Current Price: {data['current_price']}")
-            print(f"   {trend_emoji} Price Trend: {data['price_trend'].title()}")
-            
-            # Market metric
-            print(f"   🏢 Market Cap: {data['market_cap'].title()}")
-            print(f"   📊 Volatility: {data['volatility'].title()}")
-            print(f"   👥 Adoption: {data['adoption'].title()}")
-            
-            # Growth and sustanability
-            growth_emoji = "🚀" if data['growth_potential'] == 'very_high' else "📈" if data['growth_potential'] == 'high' else "📊"
-            print(f"   {growth_emoji} Growth Potential: {data['growth_potential'].replace('_', ' ').title()}")
-            
-            # Sustainability score with visual indicator
-            sustainability_emoji = "🌱" if data['sustainability_score'] >= 8 else "🟢" if data['sustainability_score'] >= 6 else "🟡" if data['sustainability_score'] >= 4 else "🔴"
-            sustainability_bars = "█" * data['sustainability_score'] + "░" * (10 - data['sustainability_score'])
-            print(f"   {sustainability_emoji} Sustainability: {data['sustainability_score']}/10 [{sustainability_bars}]")
-            print(f"   ⚡ Energy Use: {data['energy_use'].replace('_', ' ').title()}")
-            
-            # Quick recommendation
-            if data['sustainability_score'] >= 8:
-                print(f"   💡 Recommendation: Excellent eco-friendly choice! 🌿")
-            elif data['growth_potential'] == 'very_high':
-                print(f"   💡 Recommendation: High growth potential! 🚀")
-            elif data['price_trend'] == 'rising' and data['adoption'] == 'high':
-                print(f"   💡 Recommendation: Strong momentum with good adoption! 📈")
-            elif data['volatility'] == 'medium' and data['adoption'] == 'high':
-                print(f"   💡 Recommendation: Stable choice with good market presence! 👍")
-        
-        # Summary statistics
-        print("\n" + "=" * 80)
-        print("📈 MARKET OVERVIEW")
-        print("=" * 80)
-        
-        # Calculate statistics
-        rising_coins = [coin for coin, data in self.crypto_db.items() if data['price_trend'] == 'rising']
-        stable_coins = [coin for coin, data in self.crypto_db.items() if data['price_trend'] == 'stable']
-        eco_friendly = [coin for coin, data in self.crypto_db.items() if data['sustainability_score'] >= 7]
-        high_growth = [coin for coin, data in self.crypto_db.items() if data['growth_potential'] in ['high', 'very_high']]
-        high_adoption = [coin for coin, data in self.crypto_db.items() if data['adoption'] == 'high']
-        
-        print(f"📈 Rising Trend: {len(rising_coins)} coins ({', '.join(rising_coins)})")
-        print(f"📊 Stable Trend: {len(stable_coins)} coins ({', '.join(stable_coins)})")
-        print(f"🌱 Eco-Friendly (7+ score): {len(eco_friendly)} coins ({', '.join(eco_friendly)})")
-        print(f"🚀 High Growth Potential: {len(high_growth)} coins ({', '.join(high_growth)})")
-        print(f"👥 High Adoption: {len(high_adoption)} coins ({', '.join(high_adoption)})")
-        
-        # Best picks by category
-        print(f"\n🏆 TOP PICKS BY CATEGORY:")
-        print("-" * 40)
-        
-        # Most sustainable
-        most_sustainable = max(self.crypto_db.items(), key=lambda x: x[1]['sustainability_score'])
-        print(f"🌱 Most Sustainable: {most_sustainable[0]} (Score: {most_sustainable[1]['sustainability_score']}/10)")
-        
-        # Highest growth potential
-        growth_scores = {"very_high": 4, "high": 3, "moderate": 2, "low": 1}
-        highest_growth = max(self.crypto_db.items(), key=lambda x: growth_scores.get(x[1]['growth_potential'], 1))
-        print(f"🚀 Highest Growth: {highest_growth[0]} ({highest_growth[1]['growth_potential'].replace('_', ' ').title()})")
-        
-        # Best balanced (sustainability + growth)
-        balanced_scores = []
-        for coin, data in self.crypto_db.items():
-            balance_score = data['sustainability_score'] + growth_scores.get(data['growth_potential'], 1) * 2
-            balanced_scores.append((coin, balance_score))
-        best_balanced = max(balanced_scores, key=lambda x: x[1])
-        print(f"⚖️  Best Balanced: {best_balanced[0]} (Sustainability + Growth)")
-        
-        print("=" * 80)
-
-    def normalize_query(self, query):
-        """Clean and normalize user input"""
-        return query.lower().strip()
-
-    def find_sustainable_coins(self):
-        """Find coins with high sustainability scores"""
-        sustainable_coins = []
-        for coin, data in self.crypto_db.items():
-            if data["sustainability_score"] >= 7:
-                sustainable_coins.append((coin, data["sustainability_score"]))
-        
-        # Sort by sustainability score (highest first)
-        sustainable_coins.sort(key=lambda x: x[1], reverse=True)
-        return sustainable_coins
-
-    def find_trending_coins(self):
-        """Find coins with rising price trends"""
-        trending_coins = []
-        for coin, data in self.crypto_db.items():
-            if data["price_trend"] == "rising":
-                trending_coins.append(coin)
-        return trending_coins
-
-    def find_profitable_coins(self):
-        """Find coins with high profitability potential"""
-        profitable_coins = []
-        growth_scores = {"very_high": 4, "high": 3, "moderate": 2, "low": 1}
-        
-        for coin, data in self.crypto_db.items():
-            score = 0
-            if data["price_trend"] == "rising":
-                score += 2
-            if data["market_cap"] == "high":
-                score += 1
-            score += growth_scores.get(data["growth_potential"], 1)
-            
-            profitable_coins.append((coin, score))
-        
-        # Sort by profitability score (highest first)
-        profitable_coins.sort(key=lambda x: x[1], reverse=True)
-        return profitable_coins
-
-    def get_coin_details(self, coin_name):
-        """Get detailed information about a specific coin"""
-        for coin, data in self.crypto_db.items():
-            if coin.lower() == coin_name.lower() or data["symbol"].lower() == coin_name.lower():
-                return coin, data
-        return None, None
-
-    def analyze_query(self, query):
-        """Analyze user query and determine intent"""
-        query = self.normalize_query(query)
-        
-        # Define keyword patterns
-        summary_keywords = ["summary", "all coins", "all crypto", "overview", "list all", "show all", "detailed summary", "full summary", "complete list", "confused","help" ]
-        sustainable_keywords = ["sustainable", "eco", "green", "environment", "clean", "carbon"]
-        trending_keywords = ["trending", "rising", "hot", "pumping", "growing", "up"]
-        profitable_keywords = ["profit", "money", "rich", "gain", "invest", "buy", "best", "millionaire", "million"]
-        long_term_keywords = ["long term", "future", "hold", "hodl", "years"]
-        specific_coin_keywords = ["bitcoin", "btc", "ethereum", "eth", "cardano", "ada", "solana", "sol", "polygon", "matic", "chainlink", "link"]
-
-        # Check for summary queries first
-        if any(keyword in query for keyword in summary_keywords):
-            return "summary", None
-
-        # Check for specific coin queries
-        for keyword in specific_coin_keywords:
-            if keyword in query:
-                return "specific_coin", keyword
-
-        # Check for sustainability queries
-        if any(keyword in query for keyword in sustainable_keywords):
-            return "sustainable", None
-
-        # Check for trending queries
-        if any(keyword in query for keyword in trending_keywords):
-            return "trending", None
-
-        # Check for profitability queries
-        if any(keyword in query for keyword in profitable_keywords):
-            return "profitable", None
-
-        # Check for long-term queries
-        if any(keyword in query for keyword in long_term_keywords):
-            return "long_term", None
-
-        return "general", None
-
-    def generate_response(self, query):
-        """Generate appropriate response based on query analysis"""
-        intent, specific = self.analyze_query(query)
-        
-        if intent == "summary":
-            self.display_detailed_summary()
-            return "Hope this detailed overview helps you make informed decisions! 📊✨"
-        
-        elif intent == "sustainable":
-            sustainable_coins = self.find_sustainable_coins()
-            if sustainable_coins:
-                top_coin = sustainable_coins[0]
-                coin_data = self.crypto_db[top_coin[0]]
-                response = f"🌱 For sustainability, I recommend {top_coin[0]} ({coin_data['symbol']})!\n"
-                response += f"   • Sustainability Score: {top_coin[1]}/10\n"
-                response += f"   • Energy Use: {coin_data['energy_use']}\n"
-                response += f"   • Current Price: {coin_data['current_price']}\n"
-                response += f"   • It's eco-friendly and has great long-term potential! 🚀"
-                
-                if len(sustainable_coins) > 1:
-                    response += f"\n\n   Other green options: {', '.join([coin[0] for coin in sustainable_coins[1:3]])}"
-            else:
-                response = "🤔 I couldn't find highly sustainable options in my database right now."
-
-        elif intent == "trending":
-            trending_coins = self.find_trending_coins()
-            if trending_coins:
-                response = f"📈 Hot and trending right now: {', '.join(trending_coins[:3])}!\n"
-                for coin in trending_coins[:2]:
-                    coin_data = self.crypto_db[coin]
-                    response += f"\n   • {coin} ({coin_data['symbol']}): {coin_data['current_price']} - {coin_data['growth_potential']} growth potential"
-                response += "\n\n🔥 These coins are showing strong upward momentum!"
-            else:
-                response = "🤷‍♂️ No clear trending patterns in my current data."
-
-        elif intent == "profitable":
-            profitable_coins = self.find_profitable_coins()
-            if profitable_coins:
-                top_coin = profitable_coins[0][0]
-                coin_data = self.crypto_db[top_coin]
-                response = f"💰 For maximum profit potential, consider {top_coin} ({coin_data['symbol']})!\n"
-                response += f"   • Current Price: {coin_data['current_price']}\n"
-                response += f"   • Growth Potential: {coin_data['growth_potential']}\n"
-                response += f"   • Market Cap: {coin_data['market_cap']}\n"
-                response += f"   • Price Trend: {coin_data['price_trend']} 📊"
-                
-                response += f"\n\n   Other profitable picks: {', '.join([coin[0] for coin, score in profitable_coins[1:3]])}"
-            else:
-                response = "📉 Market conditions are mixed right now."
-
-        elif intent == "specific_coin":
-            coin_name, coin_data = self.get_coin_details(specific)
-            if coin_data:
-                response = f"📊 {coin_name} ({coin_data['symbol']}) Analysis:\n"
-                response += f"   • Price: {coin_data['current_price']}\n"
-                response += f"   • Trend: {coin_data['price_trend']} {'📈' if coin_data['price_trend'] == 'rising' else '📊'}\n"
-                response += f"   • Market Cap: {coin_data['market_cap']}\n"
-                response += f"   • Growth Potential: {coin_data['growth_potential']}\n"
-                response += f"   • Sustainability: {coin_data['sustainability_score']}/10 {'🌱' if coin_data['sustainability_score'] >= 7 else '⚡'}\n"
-                response += f"   • Adoption Level: {coin_data['adoption']}"
-                
-                if coin_data['sustainability_score'] >= 7:
-                    response += "\n\n🌿 This is an eco-friendly choice!"
-                if coin_data['price_trend'] == 'rising':
-                    response += "\n📈 Currently showing positive momentum!"
-            else:
-                response = f"🤔 I don't have data on '{specific}' in my database. Try Bitcoin, Ethereum, Cardano, Solana, Polygon, or Chainlink!"
-
-        elif intent == "long_term":
-            # recommend based on sustainability + growth potential
-            long_term_picks = []
-            for coin, data in self.crypto_db.items():
-                score = data['sustainability_score'] + (3 if data['growth_potential'] == 'high' else 2 if data['growth_potential'] == 'moderate' else 1)
-                long_term_picks.append((coin, score))
-            
-            long_term_picks.sort(key=lambda x: x[1], reverse=True)
-            top_pick = long_term_picks[0][0]
-            coin_data = self.crypto_db[top_pick]
-            
-            response = f"🎯 For long-term holding, I recommend {top_pick} ({coin_data['symbol']})!\n"
-            response += f"   • Sustainable (Score: {coin_data['sustainability_score']}/10)\n"
-            response += f"   • Strong growth potential: {coin_data['growth_potential']}\n"
-            response += f"   • Current entry point: {coin_data['current_price']}\n"
-            response += f"\n   Other solid long-term picks: {', '.join([coin[0] for coin, score in long_term_picks[1:3]])}"
-
-        else:
-            # General response
-            responses = [
-                "🚀 Ready to explore? Ask me about Bitcoin, Ethereum, Cardano, what's hot in the market, or type 'summary' for a detailed overview!",
-                "📈 I'm here to help! What's your crypto goal - quick gains, long-term growth, eco-friendly investing, or want to see all coins summary?"
-            ]
-            response = random.choice(responses)
-
-        # Add disclaimer
-        if intent != "summary":
-            response += f"\n\n{random.choice(self.disclaimers)}"
-        return response
-
-    def chat(self):
-        """Main chat loop"""
-        self.greet()
-        
-        while True:
-            try:
-                user_input = input(f"\n💬 You: ").strip()
-                
-                if not user_input:
-                    continue
-                    
-                if user_input.lower() in ['quit', 'exit', 'bye', 'goodbye']:
-                    print(f"\n🤖 {self.name}: Thanks for chatting! May your crypto journey be profitable and green! Eitah!! 🚀💚")
-                    print("=" * 60)
-                    break
-                
-                # Generate and display response
-                response = self.generate_response(user_input)
-                print(f"\n🤖 {self.name}: {response}")
-                
-            except KeyboardInterrupt:
-                print(f"\n\n🤖 {self.name}: Goodbye! Happy trading! 👋")
-                break
-            except Exception as e:
-                print(f"\n🤖 {self.name}: Oops! Something went wrong. Let's try again! 🔄")
-
-
-def get_market_summary(crypto_db):
-    """Generate a market summary"""
-    rising_count = sum(1 for data in crypto_db.values() if data['price_trend'] == 'rising')
-    stable_count = sum(1 for data in crypto_db.values() if data['price_trend'] == 'stable')
-    high_sustainable = sum(1 for data in crypto_db.values() if data['sustainability_score'] >= 7)
-    
-    print("📊 MARKET SUMMARY")
-    print("-" * 30)
-    print(f"📈 Rising: {rising_count} coins")
-    print(f"📊 Stable: {stable_count} coins") 
-    print(f"🌱 Eco-friendly (7+ sustainability): {high_sustainable} coins")
-    print("-" * 30)
-
-if __name__ == "__main__":
-    chatbot = EzeCrypto()
+    }
 
 @app.route('/')
-def home():
-    return render_template('index.html')
+def index():
+    """Serve the main chat interface"""
+    try:
+        # Read the HTML file from the uploaded document
+        with open('paste.txt', 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        return html_content
+    except FileNotFoundError:
+        # Fallback minimal HTML if file not found
+        return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>EzeCrypto</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                .container { max-width: 800px; margin: 0 auto; }
+                .error { color: red; padding: 20px; background: #ffe6e6; border-radius: 5px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>🚀 EzeCrypto</h1>
+                <div class="error">
+                    <p>Chat interface file not found. Please ensure 'paste.txt' is in the same directory as this Flask app.</p>
+                    <p>You can still test the API endpoints:</p>
+                    <ul>
+                        <li>POST /chat - Send messages</li>
+                        <li>GET /full_summary - Get comprehensive summary</li>
+                    </ul>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    user_input = request.form.get('message')
-    response = chatbot.generate_response(user_input)
-    return jsonify({'response': response})
+    """Handle chat messages"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'message' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'No message provided'
+            }), 400
+        
+        user_message = data['message'].strip()
+        
+        if not user_message:
+            return jsonify({
+                'success': False,
+                'error': 'Empty message'
+            }), 400
+        
+        # Generate response
+        bot_response = generate_crypto_response(user_message)
+        
+        return jsonify({
+            'success': True,
+            'response': {
+                'message': bot_response,
+                'type': 'text'
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Server error: {str(e)}'
+        }), 500
 
 @app.route('/full_summary')
 def full_summary():
-    return jsonify(chatbot.display_detailed_summary())
+    """Generate and return comprehensive crypto summary"""
+    try:
+        summary_data = generate_full_summary()
+        
+        return jsonify({
+            'success': True,
+            'type': 'summary',
+            'data': summary_data
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Could not generate summary: {str(e)}'
+        }), 500
+
+@app.route('/health')
+def health():
+    """Health check endpoint"""
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat(),
+        'available_coins': len(CRYPTO_DATA)
+    })
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    print("🚀 Starting EzeCrypto Flask Server...")
+    print("📊 Loaded", len(CRYPTO_DATA), "cryptocurrencies")
+    print("🌐 Server will be available at http://localhost:5000")
+    app.run(debug=True, host='0.0.0.0', port=5000)

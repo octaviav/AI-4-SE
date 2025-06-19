@@ -22,9 +22,9 @@
         }
 
         .chat-container {
-            width: 80%;
-            max-width: 600px;
-            height: 90vh;
+            width: 100%;
+            max-width: 900px;
+            height: 100vh;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
@@ -38,7 +38,7 @@
         .header {
             background: linear-gradient(135deg, #ff6b6b, #ffa726);
             color: white;
-            padding: 10px 15px;
+            padding: 25px 30px;
             text-align: center;
             position: relative;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
