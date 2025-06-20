@@ -22,17 +22,17 @@ ezecrypto/
 ## Getting Started
 Follow the steps below to set up the project locally:
 1. **Clone the Repository**
-
 ```bash
 Copy code
 git clone https://github.com/octaviav/AI-4-SE.git
 cd ezecrypto
+```
 
-2. Run the Server
-
+2. **Run the Server**
 ```bash
 Copy code
 python app.py
+```
 
 3. Once started, open your browser and go to:
  http://localhost:5000.
