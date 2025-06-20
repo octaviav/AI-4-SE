@@ -20,23 +20,29 @@ ezecrypto/
 ├── README.md # Project documentation
 
 ## Getting Started
-1. Clone the Repository
-bash
+Follow the steps below to set up the project locally:
+1. **Clone the Repository**
+
+```bash
 Copy code
 git clone https://github.com/octaviav/AI-4-SE.git
 cd ezecrypto
+
 2. Run the Server
-bash
+
+```bash
 Copy code
 python app.py
-Once started, open your browser and go to http://localhost:5000.
+
+3. Once started, open your browser and go to:
+ http://localhost:5000.
 
 ## API Endpoints
 POST /chat
 Send a message to the chatbot and receive a contextual response.
 
 ## Example Request
-bash
+```bash
 Copy code
 curl -X POST http://localhost:5000/chat \
 -H "Content-Type: application/json" \
@@ -56,13 +62,13 @@ Copy code
 GET /full_summary
 Returns a detailed JSON summary of all cryptocurrencies and statistics.
 
-bash
+```bash
 Copy code
 curl http://localhost:5000/full_summary
 GET /health
 Returns a basic health check and metadata.
 
-bash
+```bash
 Copy code
 curl http://localhost:5000/health
 🖥️ Optional: HTML Chat Interface
