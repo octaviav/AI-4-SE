@@ -1,0 +1,98 @@
+{
+    "Bitcoin": {
+        "symbol": "BTC",
+        "current_price": "$43,250",
+        "market_cap": "$847B",
+        "price_trend": "rising",
+        "volatility": "Medium",
+        "adoption": "Very High",
+        "growth_potential": "moderate_growth",
+        "sustainability_score": 3,
+        "energy_use": "Very High",
+        "recommendation": "Strong store of value but high energy consumption"
+    },
+    "Ethereum": {
+        "symbol": "ETH",
+        "current_price": "$2,650",
+        "market_cap": "$318B",
+        "price_trend": "stable",
+        "volatility": "Medium",
+        "adoption": "Very High",
+        "growth_potential": "high_growth",
+        "sustainability_score": 8,
+        "energy_use": "Low (after merge)",
+        "recommendation": "Excellent for DeFi and smart contracts with improved sustainability"
+    },
+    "Cardano": {
+        "symbol": "ADA",
+        "current_price": "$0.48",
+        "market_cap": "$17B",
+        "price_trend": "rising",
+        "volatility": "High",
+        "adoption": "Medium",
+        "growth_potential": "high_growth",
+        "sustainability_score": 9,
+        "energy_use": "Very Low",
+        "recommendation": "Great sustainable choice with strong academic foundation"
+    },
+    "Solana": {
+        "symbol": "SOL",
+        "current_price": "$98",
+        "market_cap": "$43B",
+        "price_trend": "rising",
+        "volatility": "High",
+        "adoption": "High",
+        "growth_potential": "very_high_growth",
+        "sustainability_score": 7,
+        "energy_use": "Low",
+        "recommendation": "Fast and efficient but still developing ecosystem"
+    },
+    "Polkadot": {
+        "symbol": "DOT",
+        "current_price": "$7.20",
+        "market_cap": "$9B",
+        "price_trend": "stable",
+        "volatility": "High",
+        "adoption": "Medium",
+        "growth_potential": "high_growth",
+        "sustainability_score": 8,
+        "energy_use": "Low",
+        "recommendation": "Innovative interoperability solution with good sustainability"
+    },
+    "Algorand": {
+        "symbol": "ALGO",
+        "current_price": "$0.19",
+        "market_cap": "$1.5B",
+        "price_trend": "stable",
+        "volatility": "Medium",
+        "adoption": "Low",
+        "growth_potential": "high_growth",
+        "sustainability_score": 10,
+        "energy_use": "Carbon Negative",
+        "recommendation": "Most sustainable option with strong technology foundation"
+    },
+    "Tezos": {
+        "symbol": "XTZ",
+        "current_price": "$1.02",
+        "market_cap": "$950M",
+        "price_trend": "declining",
+        "volatility": "High",
+        "adoption": "Low",
+        "growth_potential": "moderate_growth",
+        "sustainability_score": 9,
+        "energy_use": "Very Low",
+        "recommendation": "Sustainable and self-upgrading but needs more adoption"
+    },
+    "Chainlink": {
+        "symbol": "LINK",
+        "current_price": "$14.80",
+        "market_cap": "$8.2B",
+        "price_trend": "rising",
+        "volatility": "High",
+        "adoption": "High",
+        "growth_potential": "high_growth",
+        "sustainability_score": 6,
+        "energy_use": "Medium",
+        "recommendation": "Essential oracle infrastructure with growing demand"
+    }
+} 
